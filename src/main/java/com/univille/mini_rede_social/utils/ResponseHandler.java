@@ -17,7 +17,7 @@ public class ResponseHandler {
 		return new ResponseEntity<Object>(map, status);
     }
 
-    private Map<String, Object> generateMap(String message, boolean sucessful, HttpStatus status, Object responseObj){
+    public Map<String, Object> generateMap(String message, boolean sucessful, HttpStatus status, Object responseObj){
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("sucessful", sucessful);
         map.put("timestamp", new Timestamp(System.currentTimeMillis()).toString());
