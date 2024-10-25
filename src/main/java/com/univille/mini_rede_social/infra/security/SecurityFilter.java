@@ -24,7 +24,7 @@ import lombok.AllArgsConstructor;
 public class SecurityFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
-    
+
     private final UsuarioRepository usuarioRepository;
 
     private final ResponseHandler responseHandler;
@@ -39,7 +39,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                 var subject = tokenService.getSubject(tokenJWT);
                 var usuario = usuarioRepository.findByEmail(subject);
 
-                var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+                var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.get().getAuthorities());
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
