@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +20,9 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-@Scope("prototype")
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class TokenService {
     
-    @Autowired
     private final AppConfigurations appConfigurations;
 
     public String gerarToken(Usuario usuario){

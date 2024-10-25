@@ -39,7 +39,7 @@ public class Usuario implements UserDetails {
     private String senha;
 
     @Column(name = "USU_EMAIL_CONFIRMADO")
-    private Boolean emailConfirmado;
+    private boolean emailConfirmado;
 
     @Column(name = "USU_NOME")
     private String nome;
