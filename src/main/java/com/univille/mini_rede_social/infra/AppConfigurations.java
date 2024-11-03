@@ -12,4 +12,6 @@ public class AppConfigurations {
     @Value("${MINI_REDE_SOCIAL_SECURITY_TOKEN_SECRET}")
     private String tokenSecret;
 
+    @Value("${MINI_REDE_SOCIAL_EMAIL_ACCOUNT}")
+    private String emailAccount;
 }
