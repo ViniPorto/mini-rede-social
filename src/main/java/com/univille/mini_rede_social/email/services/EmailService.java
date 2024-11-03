@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class EmailService {
+
     private final JavaMailSender emailSender;
+    
     private final AppConfigurations appConfigurations;
 
     public void enviarEmail(String destinatario, String assunto, String texto){
@@ -19,6 +21,6 @@ public class EmailService {
         message.setText(texto);
         message.setFrom(this.appConfigurations.getEmailAccount());
         emailSender.send(message);
-
     }
+
 }
