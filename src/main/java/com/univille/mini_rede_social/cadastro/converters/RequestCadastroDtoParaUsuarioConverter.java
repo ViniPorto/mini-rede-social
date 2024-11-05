@@ -9,7 +9,7 @@ import com.univille.mini_rede_social.login.models.Usuario;
 public class RequestCadastroDtoParaUsuarioConverter {
     
     public Usuario converter(RequestCadastro requestCadastro) {
-        Usuario usuario = new Usuario();
+        var usuario = new Usuario();
         usuario.setEmail(requestCadastro.getEmail());
         usuario.setSenha(requestCadastro.getSenha());
         usuario.setNome(requestCadastro.getNomeUsuario());

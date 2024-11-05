@@ -15,7 +15,6 @@ import com.univille.mini_rede_social.cadastro.models.ConfirmacaoEmail;
 import com.univille.mini_rede_social.cadastro.repositories.ConfirmacaoEmailRepository;
 import com.univille.mini_rede_social.email.services.EmailService;
 import com.univille.mini_rede_social.infra.AppConfigurations;
-import com.univille.mini_rede_social.login.models.Usuario;
 import com.univille.mini_rede_social.login.repositories.UsuarioRepository;
 
 import jakarta.transaction.Transactional;
@@ -45,11 +44,11 @@ public class CadastroService {
         }
 
         requestCadastro.setSenha(this.passwordEncoder.encode(requestCadastro.getSenha()));
-        Usuario usuario = this.requestCadastroDtoParaUsuarioConverter.converter(requestCadastro);
+        var usuario = this.requestCadastroDtoParaUsuarioConverter.converter(requestCadastro);
 
         this.usuarioRepository.save(usuario);
 
-        ConfirmacaoEmail confirmacaoEmail = new ConfirmacaoEmail();
+        var confirmacaoEmail = new ConfirmacaoEmail();
         confirmacaoEmail.setCodigoConfirmacao(String.valueOf(this.gerarChaveAleatoria()));
         confirmacaoEmail.setUsuario(usuario);
         confirmacaoEmail.setDataExpiracao(this.gerarDataExpiracao());
@@ -64,7 +63,7 @@ public class CadastroService {
     }
 
     private Date gerarDataExpiracao() {
-        Calendar calendario = Calendar.getInstance(TimeZone.getTimeZone("America/Sao_Paulo"));
+        var calendario = Calendar.getInstance(TimeZone.getTimeZone("America/Sao_Paulo"));
         calendario.add(Calendar.MINUTE, this.appConfigurations.getMinutosParaEnviarCodigoConfirmacao());
 
         return calendario.getTime();
