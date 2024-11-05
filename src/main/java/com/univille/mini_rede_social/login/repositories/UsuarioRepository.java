@@ -11,5 +11,7 @@ import com.univille.mini_rede_social.login.models.Usuario;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Optional<Usuario> findByEmail(String email);
+
+    boolean existsByEmail(String email);
     
 }

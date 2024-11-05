@@ -14,4 +14,8 @@ public class AppConfigurations {
 
     @Value("${MINI_REDE_SOCIAL_EMAIL_ACCOUNT}")
     private String emailAccount;
+
+    @Value("${MINI_REDE_SOCIAL_MINUTOS_PARA_ENVIAR_CODIGO_CONFIRMACAO}")
+    private Integer minutosParaEnviarCodigoConfirmacao;
+    
 }
