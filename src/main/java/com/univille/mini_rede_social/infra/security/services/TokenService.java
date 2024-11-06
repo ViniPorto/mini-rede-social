@@ -42,7 +42,7 @@ public class TokenService {
         try {
             var algoritmo = Algorithm.HMAC256(appConfigurations.getTokenSecret());
             return JWT.require(algoritmo)
-                .withIssuer("HealthLab API")
+                .withIssuer("Mini-rede-social")
                 .build()
                 .verify(tokenJWT)
                 .getSubject();
