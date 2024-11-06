@@ -31,7 +31,8 @@ public class SecurityConfiguration {
                                                 "/cadastro/usuario",
                                                 "/cadastro/confirmacao/email",
                                                 "/cadastro/confirmacao/reenviar",
-                                                "/cadastro/solicitacao/troca/senha").permitAll()
+                                                "/cadastro/solicitacao/troca/senha",
+                                                "/cadastro/confirmacao/troca/senha").permitAll()
                 .anyRequest().authenticated()
                 .and().addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
     }

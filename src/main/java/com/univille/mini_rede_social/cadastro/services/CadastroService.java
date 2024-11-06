@@ -13,14 +13,18 @@ import com.univille.mini_rede_social.cadastro.converters.RequestCadastroDtoParaU
 import com.univille.mini_rede_social.cadastro.dto.input.RequestAlterarDadosCadastrais;
 import com.univille.mini_rede_social.cadastro.dto.input.RequestCadastro;
 import com.univille.mini_rede_social.cadastro.dto.input.RequestConfirmarEmail;
+import com.univille.mini_rede_social.cadastro.dto.input.RequestConfirmarTrocaSenha;
 import com.univille.mini_rede_social.cadastro.dto.input.RequestReenviarEmailConfirmacao;
+import com.univille.mini_rede_social.cadastro.dto.input.RequestSolicitarTrocaSenha;
 import com.univille.mini_rede_social.cadastro.exceptions.CodigoConfirmacaoExpiradoException;
 import com.univille.mini_rede_social.cadastro.exceptions.ConfirmacaoNaoEncontradaException;
 import com.univille.mini_rede_social.cadastro.exceptions.EmailJaConfirmadoException;
 import com.univille.mini_rede_social.cadastro.exceptions.UsuarioJaCadastradoException;
 import com.univille.mini_rede_social.cadastro.exceptions.UsuarioNaoCadastradoException;
 import com.univille.mini_rede_social.cadastro.models.ConfirmacaoEmail;
+import com.univille.mini_rede_social.cadastro.models.EsquecimentoSenha;
 import com.univille.mini_rede_social.cadastro.repositories.ConfirmacaoEmailRepository;
+import com.univille.mini_rede_social.cadastro.repositories.EsquecimentoSenhaRepository;
 import com.univille.mini_rede_social.email.services.EmailService;
 import com.univille.mini_rede_social.infra.AppConfigurations;
 import com.univille.mini_rede_social.login.models.Usuario;
@@ -38,6 +42,8 @@ public class CadastroService {
     private final ConfirmacaoEmailRepository confirmacaoEmailRepository;
 
     private final UsuarioRepository usuarioRepository;
+
+    private final EsquecimentoSenhaRepository esquecimentoSenhaRepository;
 
     private final RequestCadastroDtoParaUsuarioConverter requestCadastroDtoParaUsuarioConverter;
 
@@ -159,6 +165,56 @@ public class CadastroService {
 
         this.usuarioRepository.save(usuario);
 
+    }
+
+    @Transactional
+    public void solicitarTrocaSenha(RequestSolicitarTrocaSenha requestSolicitarTrocaSenha) throws UsuarioNaoCadastradoException {
+        
+        var usuarioOpt = this.usuarioRepository.findByEmail(requestSolicitarTrocaSenha.getEmail());
+
+        if(usuarioOpt.isEmpty()) {
+            throw new UsuarioNaoCadastradoException("Não encontrado usuário com o email informado.");
+        }
+
+        var usuario = usuarioOpt.get();
+
+        this.esquecimentoSenhaRepository.deleteByUsuario(usuario); //Caso tenha solicitado anteriormente
+
+        var esquecimentoSenha = new EsquecimentoSenha();
+        esquecimentoSenha.setUsuario(usuario);
+        esquecimentoSenha.setCodigoConfirmacao(String.valueOf(this.gerarChaveAleatoria()));
+        esquecimentoSenha.setDataExpiracao(this.gerarDataExpiracao());
+        esquecimentoSenha.setNovaSenha(this.passwordEncoder.encode(requestSolicitarTrocaSenha.getNovaSenha()));
+
+        this.esquecimentoSenhaRepository.save(esquecimentoSenha);
+
+        this.emailService.enviarEmail(usuario.getEmail(), "Esquecimento de senha", String.format("Prezado %s, a sua chave de confirmação para a Mini Rede Social é: %s", usuario.getNome(), esquecimentoSenha.getCodigoConfirmacao()));
+    }
+
+    public void confirmarTrocaSenha(RequestConfirmarTrocaSenha requestConfirmarTrocaSenha) throws Exception {
+        var usuarioOpt = this.usuarioRepository.findByEmail(requestConfirmarTrocaSenha.getEmail());                      
+
+        if(usuarioOpt.isEmpty()) {
+            throw new UsuarioNaoCadastradoException("Não encontrado usuário com o email informado.");
+        }
+
+        var usuario = usuarioOpt.get();
+
+        var esquecimentoSenhaOpt = this.esquecimentoSenhaRepository.findByCodigoConfirmacaoAndUsuario(requestConfirmarTrocaSenha.getCodigoConfirmacao(), usuario);
+
+        if(esquecimentoSenhaOpt.isEmpty()) {
+            throw new ConfirmacaoNaoEncontradaException("Código de confirmação fornecido inválido para o email informado.");
+        }
+
+        var esquecimentoSenha = esquecimentoSenhaOpt.get();
+
+        if(esquecimentoSenha.getDataExpiracao().before(new Date())) {
+            throw new CodigoConfirmacaoExpiradoException("Código de confirmação expirado.");
+        }
+
+        usuario.setSenha(esquecimentoSenha.getNovaSenha());
+
+        this.usuarioRepository.save(usuario);
     }
 
     private int gerarChaveAleatoria() {

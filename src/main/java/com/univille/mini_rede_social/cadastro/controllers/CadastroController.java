@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.univille.mini_rede_social.cadastro.dto.input.RequestAlterarDadosCadastrais;
 import com.univille.mini_rede_social.cadastro.dto.input.RequestCadastro;
 import com.univille.mini_rede_social.cadastro.dto.input.RequestConfirmarEmail;
+import com.univille.mini_rede_social.cadastro.dto.input.RequestConfirmarTrocaSenha;
 import com.univille.mini_rede_social.cadastro.dto.input.RequestReenviarEmailConfirmacao;
+import com.univille.mini_rede_social.cadastro.dto.input.RequestSolicitarTrocaSenha;
 import com.univille.mini_rede_social.cadastro.services.CadastroService;
 import com.univille.mini_rede_social.login.models.Usuario;
 import com.univille.mini_rede_social.utils.ResponseHandler;
@@ -66,6 +68,26 @@ public class CadastroController {
             return this.responseHandler.generateResponse("Alterado dados com sucesso", true, HttpStatus.OK, null);
         } catch (Exception e) {
             return this.responseHandler.generateResponse(String.format("Erro ao alterar dados: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        }
+    }
+
+    @PostMapping("/solicitacao/troca/senha")
+    public ResponseEntity<?> solicitarTrocaSenha(@RequestBody @Valid RequestSolicitarTrocaSenha requestSolicitarTrocaSenha) {
+        try {
+            this.cadastroService.solicitarTrocaSenha(requestSolicitarTrocaSenha);
+            return this.responseHandler.generateResponse("Solicitado troca de senha com sucesso. Verifique a caixa de email.", true, HttpStatus.OK, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Erro ao solicitar troca de senha: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        }
+    }
+
+    @PostMapping("/confirmacao/troca/senha")
+    public ResponseEntity<?> confirmarTrocaSenha(@RequestBody @Valid RequestConfirmarTrocaSenha requestConfirmarTrocaSenha) {
+        try {
+            this.cadastroService.confirmarTrocaSenha(requestConfirmarTrocaSenha);
+            return this.responseHandler.generateResponse("Senha alterada com sucesso.", true, HttpStatus.OK, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Erro ao confirmar troca de senha: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
         }
     }
 
