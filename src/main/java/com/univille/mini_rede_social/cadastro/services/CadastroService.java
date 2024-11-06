@@ -23,6 +23,7 @@ import com.univille.mini_rede_social.cadastro.models.ConfirmacaoEmail;
 import com.univille.mini_rede_social.cadastro.repositories.ConfirmacaoEmailRepository;
 import com.univille.mini_rede_social.email.services.EmailService;
 import com.univille.mini_rede_social.infra.AppConfigurations;
+import com.univille.mini_rede_social.login.models.Usuario;
 import com.univille.mini_rede_social.login.repositories.UsuarioRepository;
 
 import jakarta.transaction.Transactional;
