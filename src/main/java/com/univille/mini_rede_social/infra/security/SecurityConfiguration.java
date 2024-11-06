@@ -29,9 +29,9 @@ public class SecurityConfiguration {
                 .and().authorizeHttpRequests()
                 .requestMatchers(HttpMethod.POST, "/login", 
                                                 "/cadastro/usuario",
-                                                "/confirmacao/email",
-                                                "/confirmacao/nova",
-                                                "/solicitacao/troca/senha").permitAll()
+                                                "/cadastro/confirmacao/email",
+                                                "/cadastro/confirmacao/reenviar",
+                                                "/cadastro/solicitacao/troca/senha").permitAll()
                 .anyRequest().authenticated()
                 .and().addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
     }
