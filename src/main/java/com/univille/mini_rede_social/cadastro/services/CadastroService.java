@@ -191,6 +191,7 @@ public class CadastroService {
         this.emailService.enviarEmail(usuario.getEmail(), "Esquecimento de senha", String.format("Prezado %s, a sua chave de confirmação para a Mini Rede Social é: %s", usuario.getNome(), esquecimentoSenha.getCodigoConfirmacao()));
     }
 
+    @Transactional
     public void confirmarTrocaSenha(RequestConfirmarTrocaSenha requestConfirmarTrocaSenha) throws Exception {
         var usuarioOpt = this.usuarioRepository.findByEmail(requestConfirmarTrocaSenha.getEmail());                      
 
