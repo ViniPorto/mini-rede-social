@@ -15,7 +15,7 @@ public class ResponseSolicitacaoDto {
     
     private Long codigo;
     private ResponseUsuarioDto usuarioRemetente;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Sao_Paulo")
     private Date data;
 
     public ResponseSolicitacaoDto(Solicitacao solicitacao) {
