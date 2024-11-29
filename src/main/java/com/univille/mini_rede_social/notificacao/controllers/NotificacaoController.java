@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.univille.mini_rede_social.login.models.Usuario;
+import com.univille.mini_rede_social.notificacao.exceptions.NotificacaoNaoEncontradaException;
 import com.univille.mini_rede_social.notificacao.services.NotificacaoService;
 import com.univille.mini_rede_social.utils.ResponseHandler;
 
@@ -32,7 +33,7 @@ public class NotificacaoController {
             var notificacoes = this.notificacaoService.listarNovas(page, size, usuario);
             return this.responseHandler.generateResponse("Consulta realizada com sucesso", true, HttpStatus.OK, notificacoes);
         } catch (Exception e) {
-            return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+            return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -44,7 +45,7 @@ public class NotificacaoController {
             var notificacoes = this.notificacaoService.listarTodas(page, size, usuario);
             return this.responseHandler.generateResponse("Consulta realizada com sucesso", true, HttpStatus.OK, notificacoes);
         } catch (Exception e) {
-            return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+            return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -53,8 +54,10 @@ public class NotificacaoController {
         try {
             this.notificacaoService.confirmarLeitura(codigo, usuario);
             return this.responseHandler.generateResponse("Confirmado leitura com sucesso", true, HttpStatus.OK, null);
-        } catch (Exception e) {
+        } catch (NotificacaoNaoEncontradaException e) {
             return this.responseHandler.generateResponse(String.format("Erro ao realizar confirmar leitura: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Erro ao realizar confirmar leitura: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 

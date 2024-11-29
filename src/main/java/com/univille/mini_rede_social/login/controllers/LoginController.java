@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.univille.mini_rede_social.login.dto.input.RequestLoginDto;
+import com.univille.mini_rede_social.login.exceptions.EmailNaoConfirmadoException;
 import com.univille.mini_rede_social.login.services.LoginService;
 import com.univille.mini_rede_social.utils.ResponseHandler;
 
@@ -30,8 +31,10 @@ public class LoginController {
         try {
             var responseLoginDto = loginService.autenticar(new UsernamePasswordAuthenticationToken(requestLoginDto.getEmail(), requestLoginDto.getSenha()));
             return responseHandler.generateResponse("Autenticado com sucesso", true, HttpStatus.OK, responseLoginDto);
-        } catch (Exception e) {
+        } catch (EmailNaoConfirmadoException e) {
             return responseHandler.generateResponse(String.format("Erro ao autenticar: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return responseHandler.generateResponse(String.format("Erro ao autenticar: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
 
     }

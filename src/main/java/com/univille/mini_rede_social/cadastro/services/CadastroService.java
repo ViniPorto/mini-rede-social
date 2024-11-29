@@ -74,7 +74,7 @@ public class CadastroService {
     }
 
     @Transactional
-    public void confirmarEmail(RequestConfirmarEmail requestConfirmarEmail) throws Exception {
+    public void confirmarEmail(RequestConfirmarEmail requestConfirmarEmail) throws UsuarioNaoCadastradoException, EmailJaConfirmadoException, ConfirmacaoNaoEncontradaException, CodigoConfirmacaoExpiradoException {
         
         var usuarioOpt = this.usuarioRepository.findByEmail(requestConfirmarEmail.getEmail());
 
@@ -107,7 +107,7 @@ public class CadastroService {
     }
 
     @Transactional
-    public void reenviarEmailConfirmacao(RequestReenviarEmailConfirmacao requestReenviarEmailConfirmacao) throws Exception {
+    public void reenviarEmailConfirmacao(RequestReenviarEmailConfirmacao requestReenviarEmailConfirmacao) throws UsuarioNaoCadastradoException, EmailJaConfirmadoException {
 
         var usuarioOpt = this.usuarioRepository.findByEmail(requestReenviarEmailConfirmacao.getEmail());
 
@@ -192,7 +192,7 @@ public class CadastroService {
     }
 
     @Transactional
-    public void confirmarTrocaSenha(RequestConfirmarTrocaSenha requestConfirmarTrocaSenha) throws Exception {
+    public void confirmarTrocaSenha(RequestConfirmarTrocaSenha requestConfirmarTrocaSenha) throws UsuarioNaoCadastradoException, ConfirmacaoNaoEncontradaException, CodigoConfirmacaoExpiradoException {
         var usuarioOpt = this.usuarioRepository.findByEmail(requestConfirmarTrocaSenha.getEmail());                      
 
         if(usuarioOpt.isEmpty()) {

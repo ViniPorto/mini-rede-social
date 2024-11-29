@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.univille.mini_rede_social.login.models.Usuario;
 import com.univille.mini_rede_social.postagem.dto.input.RequestCriarComentario;
 import com.univille.mini_rede_social.postagem.dto.input.RequestCriarPostagemDto;
+import com.univille.mini_rede_social.postagem.exceptions.ComentarioNaoEncontradoException;
+import com.univille.mini_rede_social.postagem.exceptions.ImagemETextoNaoInformadosException;
+import com.univille.mini_rede_social.postagem.exceptions.ParametrosInsuficientesComentarioException;
+import com.univille.mini_rede_social.postagem.exceptions.PostagemNaoEncontradaException;
 import com.univille.mini_rede_social.postagem.services.PostagemService;
 import com.univille.mini_rede_social.utils.ResponseHandler;
 
@@ -34,8 +38,10 @@ public class PostagemController {
         try {
             this.postagemService.criarPostagem(requestCriarPostagemDto, usuario);
             return this.responseHandler.generateResponse("Postagem criada com sucesso", true, HttpStatus.CREATED, null);
-        } catch (Exception e) {
+        } catch (ImagemETextoNaoInformadosException e) {
             return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao criar a postagem: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao criar a postagem: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -44,8 +50,10 @@ public class PostagemController {
         try {
             this.postagemService.curtirOuDescurtirPostagem(codigoPostagem, usuario);
             return this.responseHandler.generateResponse("Curtido ou descurtido postagem com sucesso", true, HttpStatus.OK, null);
-        } catch (Exception e) {
+        } catch (PostagemNaoEncontradaException e) {
             return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao curtir a postagem: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao curtir a postagem: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -53,9 +61,11 @@ public class PostagemController {
     public ResponseEntity<?> comentarPostagem(@RequestBody @Valid RequestCriarComentario requestCriarComentario, @AuthenticationPrincipal Usuario usuario) {
         try {
             this.postagemService.criarComentario(requestCriarComentario, usuario);
-            return this.responseHandler.generateResponse("Comentário criado com sucesso", true, HttpStatus.OK, null);
-        } catch (Exception e) {
+            return this.responseHandler.generateResponse("Comentário criado com sucesso", true, HttpStatus.CREATED, null);
+        } catch (PostagemNaoEncontradaException | ParametrosInsuficientesComentarioException | ComentarioNaoEncontradoException e) {
             return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao criar comentário: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao criar comentário: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -64,8 +74,10 @@ public class PostagemController {
         try {
             this.postagemService.curtirOuDescurtirComentario(codigoComentario, usuario);
             return this.responseHandler.generateResponse("Curtido comentário com sucesso", true, HttpStatus.OK, null);
-        } catch (Exception e) {
+        } catch (ComentarioNaoEncontradoException e) {
             return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao curtir o comentário: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao curtir o comentário: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -77,7 +89,7 @@ public class PostagemController {
             var postagens = this.postagemService.listarTodasPostagens(page, size, usuario);
             return this.responseHandler.generateResponse("Listado postagens com sucesso", true, HttpStatus.OK, postagens);
         } catch (Exception e) {
-            return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao listar postagens: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+            return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao listar postagens: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -88,8 +100,10 @@ public class PostagemController {
         try {
             var comentarios = this.postagemService.listarComentarios(page, size, codigoPostagem);
             return this.responseHandler.generateResponse("Listado comentários com sucesso", true, HttpStatus.OK, comentarios);
-        } catch (Exception e) {
+        } catch (PostagemNaoEncontradaException e) {
             return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao listar comentários: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao listar comentários: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -101,7 +115,7 @@ public class PostagemController {
             var postagens = this.postagemService.listarPostagensDeUmUsuario(page, size, codigoUsuario);
             return this.responseHandler.generateResponse("Listado postagens com sucesso", true, HttpStatus.OK, postagens);
         } catch (Exception e) {
-            return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao listar as postagens: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+            return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao listar as postagens: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 

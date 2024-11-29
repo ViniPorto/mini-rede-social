@@ -13,8 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.univille.mini_rede_social.amizades.dto.input.RequestResponderSolicitacaoAmizadeDto;
 import com.univille.mini_rede_social.amizades.dto.input.RequestSolicitacaoAmizadeDto;
+import com.univille.mini_rede_social.amizades.exceptions.AmizadeJaExistenteException;
+import com.univille.mini_rede_social.amizades.exceptions.SolicitacaoJaEnviadaExcetion;
+import com.univille.mini_rede_social.amizades.exceptions.SolicitacaoNaoCadastradaException;
+import com.univille.mini_rede_social.amizades.exceptions.UsuarioRepetidoException;
 import com.univille.mini_rede_social.amizades.services.AmizadeService;
 import com.univille.mini_rede_social.amizades.services.SolicitacaoService;
+import com.univille.mini_rede_social.cadastro.exceptions.UsuarioNaoCadastradoException;
 import com.univille.mini_rede_social.login.models.Usuario;
 import com.univille.mini_rede_social.utils.ResponseHandler;
 
@@ -40,7 +45,7 @@ public class AmizadeController {
             var amizades = this.amizadeService.listarTodas(page, size, usuario);
             return this.responseHandler.generateResponse("Consulta realizada com sucesso", true, HttpStatus.OK, amizades);
         } catch (Exception e) {
-            return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+            return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -50,7 +55,7 @@ public class AmizadeController {
             var usuariosSugeridos = this.amizadeService.listarSugeridos(usuario);
             return this.responseHandler.generateResponse("Consulta realizada com sucesso", true, HttpStatus.OK, usuariosSugeridos);
         } catch (Exception e) {
-            return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+            return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -59,8 +64,10 @@ public class AmizadeController {
         try {
             this.solicitacaoService.criarSolicitacao(requestSolicitacaoAmizadeDto.getCodigoUsuarioAdicionar(), usuario);
             return this.responseHandler.generateResponse("Enviado solicitação com sucesso", true, HttpStatus.OK, null);
-        } catch (Exception e) {
+        } catch (UsuarioNaoCadastradoException | UsuarioRepetidoException | SolicitacaoJaEnviadaExcetion | AmizadeJaExistenteException e) {
             return this.responseHandler.generateResponse(String.format("Erro ao enviar solicitação: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Erro ao enviar solicitação: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -72,7 +79,7 @@ public class AmizadeController {
             var solicitacoes = this.solicitacaoService.listarTodas(page, size, usuario);
             return this.responseHandler.generateResponse("Consulta realizada com sucesso", true, HttpStatus.OK, solicitacoes);
         } catch (Exception e) {
-            return this.responseHandler.generateResponse(String.format("Erro ao listar solicitações: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+            return this.responseHandler.generateResponse(String.format("Erro ao listar solicitações: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -81,8 +88,10 @@ public class AmizadeController {
         try {
             this.solicitacaoService.responderSolicitacao(requestResponderSolicitacaoAmizadeDto.getAceitar(), requestResponderSolicitacaoAmizadeDto.getCodigoSolicitacao(), usuario);
             return this.responseHandler.generateResponse("Solicitação processada com sucesso", true, HttpStatus.OK, null);
-        } catch (Exception e) {
+        } catch (SolicitacaoNaoCadastradaException e) {
             return this.responseHandler.generateResponse(String.format("Erro ao responder solicitação: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Erro ao responder solicitação: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -94,7 +103,7 @@ public class AmizadeController {
             var usuarios = this.amizadeService.listarUsuariosPorNome(page, size, nome);
             return this.responseHandler.generateResponse("Consulta realizada com sucesso", true, HttpStatus.OK, usuarios);
         } catch (Exception e) {
-            return this.responseHandler.generateResponse(String.format("Erro ao listar usuários: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+            return this.responseHandler.generateResponse(String.format("Erro ao listar usuários: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -103,8 +112,10 @@ public class AmizadeController {
         try {
             var usuario = this.amizadeService.listarUsuarioPorId(id);
             return this.responseHandler.generateResponse("Consulta realizada com sucesso", true, HttpStatus.OK, usuario);
-        } catch (Exception e) {
+        } catch (UsuarioNaoCadastradoException e) {
             return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -113,8 +124,10 @@ public class AmizadeController {
         try {
             var responseConferirUsuarioAmigo = this.amizadeService.conferirSeEhAmigo(id, usuario);
             return this.responseHandler.generateResponse("Consulta realizada com sucesso", true, HttpStatus.OK, responseConferirUsuarioAmigo);
-        } catch (Exception e) {
+        } catch (UsuarioNaoCadastradoException e) {
             return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -124,7 +137,7 @@ public class AmizadeController {
             var amigos = this.amizadeService.listarAmigosDeUmUsuario(id);
             return this.responseHandler.generateResponse("Consulta realizada com sucesso", true, HttpStatus.OK, amigos);
         } catch (Exception e) {
-            return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+            return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 

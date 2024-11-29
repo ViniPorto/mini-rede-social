@@ -15,6 +15,11 @@ import com.univille.mini_rede_social.cadastro.dto.input.RequestConfirmarEmail;
 import com.univille.mini_rede_social.cadastro.dto.input.RequestConfirmarTrocaSenha;
 import com.univille.mini_rede_social.cadastro.dto.input.RequestReenviarEmailConfirmacao;
 import com.univille.mini_rede_social.cadastro.dto.input.RequestSolicitarTrocaSenha;
+import com.univille.mini_rede_social.cadastro.exceptions.CodigoConfirmacaoExpiradoException;
+import com.univille.mini_rede_social.cadastro.exceptions.ConfirmacaoNaoEncontradaException;
+import com.univille.mini_rede_social.cadastro.exceptions.EmailJaConfirmadoException;
+import com.univille.mini_rede_social.cadastro.exceptions.UsuarioJaCadastradoException;
+import com.univille.mini_rede_social.cadastro.exceptions.UsuarioNaoCadastradoException;
 import com.univille.mini_rede_social.cadastro.services.CadastroService;
 import com.univille.mini_rede_social.login.models.Usuario;
 import com.univille.mini_rede_social.utils.ResponseHandler;
@@ -35,9 +40,11 @@ public class CadastroController {
     public ResponseEntity<?> cadastrarUsuario(@RequestBody @Valid RequestCadastro requestCadastro) {
         try {
             this.cadastroService.cadastrar(requestCadastro);
-            return this.responseHandler.generateResponse("Usuário cadastrado com sucesso. Verifique a caixa de email para obter o código de confirmação.", true, HttpStatus.OK, null);
-        } catch (Exception e) {
+            return this.responseHandler.generateResponse("Usuário cadastrado com sucesso. Verifique a caixa de email para obter o código de confirmação.", true, HttpStatus.CREATED, null);
+        } catch (UsuarioJaCadastradoException e) {
             return this.responseHandler.generateResponse(String.format("Erro ao realizar cadastro: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Erro ao realizar cadastro: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -46,8 +53,10 @@ public class CadastroController {
         try {
             this.cadastroService.confirmarEmail(requestConfirmarEmail);
             return this.responseHandler.generateResponse("Email confirmado com sucesso.", true, HttpStatus.OK, null);
-        } catch (Exception e) {
+        } catch (UsuarioNaoCadastradoException | EmailJaConfirmadoException | ConfirmacaoNaoEncontradaException | CodigoConfirmacaoExpiradoException e) {
             return this.responseHandler.generateResponse(String.format("Erro ao realizar confirmação de email: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Erro ao realizar confirmação de email: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -56,8 +65,10 @@ public class CadastroController {
         try {
             this.cadastroService.reenviarEmailConfirmacao(requestReenviarEmailConfirmacao);
             return this.responseHandler.generateResponse("Reenviado email com sucesso.", true, HttpStatus.OK, null);
-        } catch (Exception e) {
+        } catch (UsuarioNaoCadastradoException | EmailJaConfirmadoException e) {
             return this.responseHandler.generateResponse(String.format("Erro ao reenviar email de confirmação: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Erro ao reenviar email de confirmação: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -76,8 +87,10 @@ public class CadastroController {
         try {
             this.cadastroService.solicitarTrocaSenha(requestSolicitarTrocaSenha);
             return this.responseHandler.generateResponse("Solicitado troca de senha com sucesso. Verifique a caixa de email.", true, HttpStatus.OK, null);
-        } catch (Exception e) {
+        } catch (UsuarioNaoCadastradoException e) {
             return this.responseHandler.generateResponse(String.format("Erro ao solicitar troca de senha: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Erro ao solicitar troca de senha: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -86,8 +99,10 @@ public class CadastroController {
         try {
             this.cadastroService.confirmarTrocaSenha(requestConfirmarTrocaSenha);
             return this.responseHandler.generateResponse("Senha alterada com sucesso.", true, HttpStatus.OK, null);
-        } catch (Exception e) {
+        } catch (UsuarioNaoCadastradoException | ConfirmacaoNaoEncontradaException | CodigoConfirmacaoExpiradoException e) {
             return this.responseHandler.generateResponse(String.format("Erro ao confirmar troca de senha: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Erro ao confirmar troca de senha: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 
