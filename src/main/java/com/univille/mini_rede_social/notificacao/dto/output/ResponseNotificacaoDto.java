@@ -15,7 +15,7 @@ public class ResponseNotificacaoDto {
     private Long codigo;
     private Long usuarioCodigo;
     private String foto;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Sao_Paulo")
     private Date dataCriacao;
     private String descricao;
     private Boolean lida;

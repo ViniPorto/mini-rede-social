@@ -17,7 +17,7 @@ public class ResponseUsuarioDto {
     private String nome;
     private String foto;
     private String resumo;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Sao_Paulo")
     private Date dataNascimento;
 
     public ResponseUsuarioDto(Usuario usuario) {

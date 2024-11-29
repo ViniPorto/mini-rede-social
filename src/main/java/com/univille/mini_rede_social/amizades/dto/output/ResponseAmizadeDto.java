@@ -15,7 +15,7 @@ public class ResponseAmizadeDto {
     private Long codigo;
     private Long usuarioPrincipalCodigo;
     private Long usuarioAmigoCodigo;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Sao_Paulo")
     private Date data;
 
     public ResponseAmizadeDto(Amizade amizade) {
