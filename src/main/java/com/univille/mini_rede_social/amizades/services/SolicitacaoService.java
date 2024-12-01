@@ -63,6 +63,8 @@ public class SolicitacaoService {
         solicitacao.setUsuarioRemetente(usuarioRemetente);
 
         this.solicitacaoRepository.save(solicitacao);
+
+        this.notificacaoService.registrarNotificacao(usuarioDestinatario, usuarioRemetente.getFoto(), new Date(), String.format("%s enviou uma solicitação de amizade!", usuarioRemetente.getNome()));
     }
 
     public Page<ResponseSolicitacaoDto> listarTodas(int page, int size, Usuario usuario) {
@@ -96,11 +98,11 @@ public class SolicitacaoService {
 
             this.amizadeRepository.save(amizade1);
             this.amizadeRepository.save(amizade2);
+
+            this.notificacaoService.registrarNotificacao(solicitacao.getUsuarioRemetente(), usuario.getFoto(), new Date(), String.format("%s aceitou sua solicitação de amizade!", usuario.getNome()));
         }
 
         this.solicitacaoRepository.delete(solicitacao);
-
-        this.notificacaoService.registrarNotificacao(solicitacao.getUsuarioRemetente(), usuario.getFoto(), new Date(), String.format("%s aceitou sua solicitação de amizade!", usuario.getNome()));
     }
 
 }

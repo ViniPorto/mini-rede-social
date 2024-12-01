@@ -181,7 +181,7 @@ public class PostagemService {
         return this.postagemRepository.listarTodasPostagensDeAmigosOrdenandoPorData(pageable, usuario.getCodigo());
     }
 
-    public Page<ResponseComentarioDto> listarComentarios(int page, int size, Long codigoPostagem) throws PostagemNaoEncontradaException {
+    public Page<ResponseComentarioDto> listarComentarios(int page, int size, Long codigoPostagem) {
         var pageable = PageRequest.of(page, size);
         return this.postagemComentarioRepository.listarTodosComentariosOrdenandoPorNumeroRespostas(pageable, codigoPostagem);
     }

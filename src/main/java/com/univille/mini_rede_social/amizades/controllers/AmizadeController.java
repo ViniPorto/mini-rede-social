@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.univille.mini_rede_social.amizades.dto.input.RequestResponderSolicitacaoAmizadeDto;
-import com.univille.mini_rede_social.amizades.dto.input.RequestSolicitacaoAmizadeDto;
 import com.univille.mini_rede_social.amizades.exceptions.AmizadeJaExistenteException;
 import com.univille.mini_rede_social.amizades.exceptions.SolicitacaoJaEnviadaExcetion;
 import com.univille.mini_rede_social.amizades.exceptions.SolicitacaoNaoCadastradaException;
@@ -59,10 +58,10 @@ public class AmizadeController {
         }
     }
 
-    @PostMapping("/solicitacao")
-    public ResponseEntity<?> solicitacaoAmizade(@RequestBody @Valid RequestSolicitacaoAmizadeDto requestSolicitacaoAmizadeDto, @AuthenticationPrincipal Usuario usuario) {
+    @PostMapping("/solicitacao/{codigoUsuarioAdicionar}")
+    public ResponseEntity<?> solicitacaoAmizade(@PathVariable Long codigoUsuarioAdicionar, @AuthenticationPrincipal Usuario usuario) {
         try {
-            this.solicitacaoService.criarSolicitacao(requestSolicitacaoAmizadeDto.getCodigoUsuarioAdicionar(), usuario);
+            this.solicitacaoService.criarSolicitacao(codigoUsuarioAdicionar, usuario);
             return this.responseHandler.generateResponse("Enviado solicitação com sucesso", true, HttpStatus.OK, null);
         } catch (UsuarioNaoCadastradoException | UsuarioRepetidoException | SolicitacaoJaEnviadaExcetion | AmizadeJaExistenteException e) {
             return this.responseHandler.generateResponse(String.format("Erro ao enviar solicitação: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
@@ -132,9 +131,11 @@ public class AmizadeController {
     }
 
     @GetMapping("/usuarios/listar/amigos/{id}")
-    public ResponseEntity<?> listarAmigosDeUmUsuario(@PathVariable Long id) {
+    public ResponseEntity<?> listarAmigosDeUmUsuario(@RequestParam(defaultValue = "0") int page,
+                                                     @RequestParam(defaultValue = "10") int size,
+                                                     @PathVariable Long id) {
         try {
-            var amigos = this.amizadeService.listarAmigosDeUmUsuario(id);
+            var amigos = this.amizadeService.listarAmigosDeUmUsuario(page, size, id);
             return this.responseHandler.generateResponse("Consulta realizada com sucesso", true, HttpStatus.OK, amigos);
         } catch (Exception e) {
             return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);

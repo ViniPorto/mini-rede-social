@@ -78,7 +78,7 @@ public class CadastroController {
             this.cadastroService.alterarDadosCadastrais(requestAlterarDadosCadastrais, usuario);
             return this.responseHandler.generateResponse("Alterado dados com sucesso", true, HttpStatus.OK, null);
         } catch (Exception e) {
-            return this.responseHandler.generateResponse(String.format("Erro ao alterar dados: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+            return this.responseHandler.generateResponse(String.format("Erro ao alterar dados: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 

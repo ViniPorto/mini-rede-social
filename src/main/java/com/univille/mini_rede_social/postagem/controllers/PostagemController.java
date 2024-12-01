@@ -100,8 +100,6 @@ public class PostagemController {
         try {
             var comentarios = this.postagemService.listarComentarios(page, size, codigoPostagem);
             return this.responseHandler.generateResponse("Listado comentários com sucesso", true, HttpStatus.OK, comentarios);
-        } catch (PostagemNaoEncontradaException e) {
-            return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao listar comentários: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
         } catch (Exception e) {
             return this.responseHandler.generateResponse(String.format("Ocorreu um erro ao listar comentários: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }

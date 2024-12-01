@@ -92,8 +92,9 @@ public class AmizadeService {
         return new ResponseConferirUsuarioAmigoDto(ehAmigo);
     }
 
-    public Page<ResponseUsuarioDto> listarAmigosDeUmUsuario(Long id) {
-        var amigos = this.amizadeRepository.listarTodasAmizades(null, id);
+    public Page<ResponseUsuarioDto> listarAmigosDeUmUsuario(int page, int size, Long id) {
+        var pageable = PageRequest.of(page, size);
+        var amigos = this.amizadeRepository.listarTodasAmizades(pageable, id);
 
         return amigos.map(ResponseUsuarioDto::new);
     }
