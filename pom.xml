@@ -93,6 +93,40 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.10</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>prepare-agent</goal>
+                    </goals>
+                </execution>
+                <execution>
+                    <id>report</id>
+                    <phase>verify</phase>
+                    <goals>
+                        <goal>report</goal>
+                    </goals>
+                </execution>
+            </executions>
+			<configuration>
+				<excludes>
+					<exclude>**/dto/**</exclude>
+					<exclude>**/exceptions/**</exclude>
+					<exclude>**/models/**</exclude>
+					<exclude>**/repositories/**</exclude>
+					<exclude>**/converters/**</exclude>
+					<exclude>**/security/CorsConfiguration.java</exclude>
+					<exclude>**/security/SecurityConfiguration.java</exclude>
+					<exclude>**/security/SecurityFilter.java</exclude>
+					<exclude>**/security/services/TokenService.java</exclude>
+					<exclude>**/infra/AppConfigurations.java</exclude>
+					<exclude>**/MiniRedeSocialApplication.java</exclude>
+				</excludes>
+			</configuration>
+        </plugin>
 		</plugins>
 	</build>
 
