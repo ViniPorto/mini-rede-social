@@ -1,6 +1,7 @@
 package com.univille.mini_rede_social.amizades.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,5 +47,7 @@ public interface AmizadeRepository extends JpaRepository<Amizade, Long> {
             WHERE a.usuarioPrincipal.codigo = :usuarioCodigo
             """)
     Page<Usuario> listarTodasAmizades(Pageable pageable, @Param("usuarioCodigo") Long usuarioCodigo);
+
+    Optional<Amizade> findByUsuarioPrincipalAndUsuarioAmigo(Usuario usuarioAmigo, Usuario usuario);
     
 }

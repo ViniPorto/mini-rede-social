@@ -27,6 +27,7 @@ import com.univille.mini_rede_social.amizades.dto.input.RequestResponderSolicita
 import com.univille.mini_rede_social.amizades.dto.output.ResponseConferirUsuarioAmigoDto;
 import com.univille.mini_rede_social.amizades.dto.output.ResponseSolicitacaoDto;
 import com.univille.mini_rede_social.amizades.exceptions.AmizadeJaExistenteException;
+import com.univille.mini_rede_social.amizades.exceptions.AmizadeNaoEncontradaException;
 import com.univille.mini_rede_social.amizades.exceptions.SolicitacaoJaEnviadaExcetion;
 import com.univille.mini_rede_social.amizades.exceptions.SolicitacaoNaoCadastradaException;
 import com.univille.mini_rede_social.amizades.exceptions.UsuarioRepetidoException;
@@ -304,5 +305,42 @@ class AmizadeControllerTest {
 
         Assertions.assertEquals(500, response.getStatusCode().value());
         Assertions.assertTrue(response.getBody().toString().contains("Erro inesperado"));
+    }
+
+    @Test
+    void deveRetornarOkQuandoDesamigarCorretamente() throws UsuarioNaoCadastradoException, AmizadeNaoEncontradaException {
+        doNothing().when(this.amizadeService).desamigar(anyLong(), any(Usuario.class));
+
+        var response = this.amizadeController.desamigar(1L, new Usuario());
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(200, response.getStatusCode().value());
+    }
+
+    @Test
+    void deveRetornarBadRequestQuandoOcorrerExcecaoConhecidaAoDesamigar() throws UsuarioNaoCadastradoException, AmizadeNaoEncontradaException {
+        doThrow(UsuarioNaoCadastradoException.class).when(this.amizadeService).desamigar(anyLong(), any(Usuario.class));
+
+        var response = this.amizadeController.desamigar(1L, new Usuario());
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(400, response.getStatusCode().value());
+
+        doThrow(AmizadeNaoEncontradaException.class).when(this.amizadeService).desamigar(anyLong(), any(Usuario.class));
+
+        response = this.amizadeController.desamigar(1L, new Usuario());
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(400, response.getStatusCode().value());
+    }
+
+    @Test
+    void deveRetornarInternalErrorQuandoOcorrerExcecaoInesperadaAoDesamigar() throws UsuarioNaoCadastradoException, AmizadeNaoEncontradaException {
+        doThrow(RuntimeException.class).when(this.amizadeService).desamigar(anyLong(), any(Usuario.class));
+
+        var response = this.amizadeController.desamigar(1L, new Usuario());
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(500, response.getStatusCode().value());
     }
 }

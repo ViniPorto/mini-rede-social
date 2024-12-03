@@ -3,6 +3,7 @@ package com.univille.mini_rede_social.amizades.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.univille.mini_rede_social.amizades.dto.input.RequestResponderSolicitacaoAmizadeDto;
 import com.univille.mini_rede_social.amizades.exceptions.AmizadeJaExistenteException;
+import com.univille.mini_rede_social.amizades.exceptions.AmizadeNaoEncontradaException;
 import com.univille.mini_rede_social.amizades.exceptions.SolicitacaoJaEnviadaExcetion;
 import com.univille.mini_rede_social.amizades.exceptions.SolicitacaoNaoCadastradaException;
 import com.univille.mini_rede_social.amizades.exceptions.UsuarioRepetidoException;
@@ -139,6 +141,18 @@ public class AmizadeController {
             return this.responseHandler.generateResponse("Consulta realizada com sucesso", true, HttpStatus.OK, amigos);
         } catch (Exception e) {
             return this.responseHandler.generateResponse(String.format("Erro ao realizar consulta: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
+        }
+    }
+
+    @DeleteMapping("/{codigoUsuarioDesamigar}")
+    public ResponseEntity<?> desamigar(@PathVariable Long codigoUsuarioDesamigar, @AuthenticationPrincipal Usuario usuario) {
+        try {
+            this.amizadeService.desamigar(codigoUsuarioDesamigar, usuario);
+            return this.responseHandler.generateResponse("Desamigado com sucesso", true, HttpStatus.OK, null);
+        } catch (UsuarioNaoCadastradoException | AmizadeNaoEncontradaException e) {
+            return this.responseHandler.generateResponse(String.format("Erro ao desamigar: %s", e.getMessage()), false, HttpStatus.BAD_REQUEST, null);
+        } catch (Exception e) {
+            return this.responseHandler.generateResponse(String.format("Erro ao desamigar: %s", e.getMessage()), false, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
     }
 

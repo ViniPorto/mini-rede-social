@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.univille.mini_rede_social.amizades.dto.output.ResponseConferirUsuarioAmigoDto;
+import com.univille.mini_rede_social.amizades.exceptions.AmizadeNaoEncontradaException;
 import com.univille.mini_rede_social.amizades.repositories.AmizadeRepository;
 import com.univille.mini_rede_social.cadastro.exceptions.UsuarioNaoCadastradoException;
 import com.univille.mini_rede_social.infra.AppConfigurations;
@@ -18,6 +19,7 @@ import com.univille.mini_rede_social.login.dto.output.ResponseUsuarioDto;
 import com.univille.mini_rede_social.login.models.Usuario;
 import com.univille.mini_rede_social.login.repositories.UsuarioRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -97,6 +99,30 @@ public class AmizadeService {
         var amigos = this.amizadeRepository.listarTodasAmizades(pageable, id);
 
         return amigos.map(ResponseUsuarioDto::new);
+    }
+
+    @Transactional
+    public void desamigar(Long codigoUsuarioDesamigar, Usuario usuario) throws UsuarioNaoCadastradoException, AmizadeNaoEncontradaException {
+        var usuarioOpt = this.usuarioRepository.findById(codigoUsuarioDesamigar);
+
+        if(usuarioOpt.isEmpty()) {
+            throw new UsuarioNaoCadastradoException("Não encontrado usuário com o código fornecido");
+        }
+
+        var usuarioAmigo = usuarioOpt.get();
+
+        var amizadeLado1opt = this.amizadeRepository.findByUsuarioPrincipalAndUsuarioAmigo(usuarioAmigo, usuario);
+        var amizadeLado2opt = this.amizadeRepository.findByUsuarioPrincipalAndUsuarioAmigo(usuario, usuarioAmigo);
+
+        if(amizadeLado1opt.isEmpty() && amizadeLado2opt.isEmpty()) {
+            throw new AmizadeNaoEncontradaException("Não encontrado amizade com o usuário informado");
+        }
+
+        var amizadeLado1 = amizadeLado1opt.get();
+        var amizadeLado2 = amizadeLado2opt.get();
+
+        this.amizadeRepository.delete(amizadeLado1);
+        this.amizadeRepository.delete(amizadeLado2);
     }
 
 }

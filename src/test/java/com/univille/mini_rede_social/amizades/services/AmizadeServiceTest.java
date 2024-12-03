@@ -4,6 +4,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import com.univille.mini_rede_social.amizades.exceptions.AmizadeNaoEncontradaException;
+import com.univille.mini_rede_social.amizades.models.Amizade;
 import com.univille.mini_rede_social.amizades.repositories.AmizadeRepository;
 import com.univille.mini_rede_social.cadastro.exceptions.UsuarioNaoCadastradoException;
 import com.univille.mini_rede_social.infra.AppConfigurations;
@@ -193,6 +197,52 @@ class AmizadeServiceTest {
 
         Assertions.assertNotNull(response);
         Assertions.assertEquals(2, response.getContent().size());
+    }
+
+    @Test
+    void deveLancarUsuarioNaoCadastradoExceptionQuandoNaoEncontrarUsuarioAoDesamigar() {
+        Usuario usuario = null;
+        var usuarioOpt = Optional.ofNullable(usuario);
+
+        when(this.usuarioRepository.findById(anyLong())).thenReturn(usuarioOpt);
+
+        Assertions.assertThrows(UsuarioNaoCadastradoException.class, () -> {
+            this.amizadeService.desamigar(1L, new Usuario());
+        });
+    }
+
+    @Test
+    void deveLancarAmizadeNaoEncontradaExceptionQuandoNaoEncontrarAmizadeAoDesamigar() {
+        var usuario = new Usuario();
+        var usuarioOpt = Optional.ofNullable(usuario);
+
+        when(this.usuarioRepository.findById(anyLong())).thenReturn(usuarioOpt);
+
+        Amizade amizade = null;
+        var amizadeOpt = Optional.ofNullable(amizade);
+
+        when(this.amizadeRepository.findByUsuarioPrincipalAndUsuarioAmigo(any(Usuario.class), any(Usuario.class))).thenReturn(amizadeOpt).thenReturn(amizadeOpt);
+
+        Assertions.assertThrows(AmizadeNaoEncontradaException.class, () -> {
+            this.amizadeService.desamigar(1L, new Usuario());
+        });
+    }
+
+    @Test
+    void deveDesamigarCorretamente() throws UsuarioNaoCadastradoException, AmizadeNaoEncontradaException {
+        var usuario = new Usuario();
+        var usuarioOpt = Optional.ofNullable(usuario);
+
+        when(this.usuarioRepository.findById(anyLong())).thenReturn(usuarioOpt);
+
+        var amizade = new Amizade();
+        var amizadeOpt = Optional.ofNullable(amizade);
+
+        when(this.amizadeRepository.findByUsuarioPrincipalAndUsuarioAmigo(any(Usuario.class), any(Usuario.class))).thenReturn(amizadeOpt).thenReturn(amizadeOpt);
+
+        this.amizadeService.desamigar(1L, new Usuario());
+
+        verify(this.amizadeRepository, times(2)).delete(any(Amizade.class));
     }
 
 }
